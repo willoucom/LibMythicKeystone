@@ -1,0 +1,5 @@
+package-as: LibMythicKeystone
+
+ignore:
+  - .gitignore
+  - .github

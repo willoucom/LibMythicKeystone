@@ -1,0 +1,20 @@
+## Interface: 100100
+## Title: LibMythicKeystone
+## Version: @project-version@
+## Notes: Libary for Mythic Keystone
+## OptionalDeps: Ace3
+## SavedVariables: LibMythicKeystoneDB
+## IconTexture: 525134
+## X-Curse-Project-ID: 868244
+
+#@no-lib-strip@
+libs\LibStub\LibStub.lua
+#@end-no-lib-strip@
+
+# for debug
+Debug.lua
+# Normal lib
+LibMythicKeystone.lua
+# Plugins
+plugin_astralkeys.lua
+plugin_angrykeystones.lua
