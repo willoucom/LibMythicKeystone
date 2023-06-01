@@ -2,20 +2,32 @@ local ADDON, Addon = ...
 
 -- print("Plugin:AngryKeystones loaded")
 
+local AngryKeystoneStorage = {}
+
+
 local function OnEvent(self, event, addOnName, message, channel, character)
     if (addOnName == "AngryKeystones") then
-        -- print("AngryKeystones received")
+        print("AngryKeystones received")
         if (string.find(message, "Schedule|")) then
+            print(message)
             local _, key = string.split("|", message)
             local keyname, keylevel = string.split(":", key)
-            if character ~= Addon.Mykey["fullname"] then
-                
-            end
+            character = string.split("-", character)
             if keyname and keylevel then
-                Addon.PartyKeys[character] = {}
-                Addon.PartyKeys[character]["current_key"] = keyname
-                Addon.PartyKeys[character]["current_keylevel"] = keylevel
+                AngryKeystoneStorage[character] = AngryKeystoneStorage[character] or {}
+                AngryKeystoneStorage[character]["current_key"] = keyname
+                AngryKeystoneStorage[character]["current_keylevel"] = keylevel
             end
+        end
+    end
+
+    for key in pairs(AngryKeystoneStorage) do
+        Addon.PartyKeys[key] = Addon.PartyKeys[key] or {}
+        if Addon.PartyKeys[key]["current_key"] == "" then
+            Addon.PartyKeys[key]["current_key"] = AngryKeystoneStorage[key]["current_key"]
+        end
+        if Addon.PartyKeys[key]["current_keylevel"] == "" then
+            Addon.PartyKeys[key]["current_keylevel"] = AngryKeystoneStorage[key]["current_keylevel"]
         end
     end
 end

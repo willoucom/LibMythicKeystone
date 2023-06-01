@@ -37,9 +37,7 @@ end
 --
 
 function Addon.getKeystone()
-    Addon.trace("Start key processing")
     if Addon.ProcessingKeys then
-        Addon.trace("Key processing in progress, skip")
         return
     end
     Addon.ProcessingKeys = true
@@ -88,7 +86,7 @@ function Addon.getKeystone()
         ["current_keylevel"] = keystoneLevel
     }
 
-    Addon.PartyKeys[pname] = {
+    Addon.PartyKeys[player] = {
         ["class"] = classFilename,
         ["name"] = pname,
         ["realm"] = sname,
@@ -99,20 +97,25 @@ function Addon.getKeystone()
 
     if IsInGroup() then
         for i = 1, 4 do
-            local pname, _ = UnitName("party"..i) or "none"
+            local name, realm = UnitName("party"..i) or ""
+            if not realm then
+                -- unit is on the same realm
+                realm = Addon.Mykey["realm"]
+            end
+            local player = string.format("%s-%s", name, realm)
             local _, class = UnitClass("party"..i)
-            Addon.PartyKeys[pname] = {
-                ["class"] = class,
-                ["name"] = pname,
-                ["realm"] = sname,
-                ["fullname"] = pname,
-                ["current_key"] = 0,
-                ["current_keylevel"] = 0
-            }
+            if player ~= "" then
+                Addon.PartyKeys[player] = Addon.PartyKeys[player] or {}
+                Addon.PartyKeys[player]["class"] = class
+                Addon.PartyKeys[player]["name"] = name
+                Addon.PartyKeys[player]["realm"] = realm
+                Addon.PartyKeys[player]["fullname"] = player
+                Addon.PartyKeys[player]["current_key"] = Addon.PartyKeys["current_key"] or ""
+                Addon.PartyKeys[player]["current_keylevel"] = Addon.PartyKeys["current_keylevel"] or ""
+            end
         end
     end
     Addon.ProcessingKeys = false
-    Addon.trace("End key processing")
 end
 
 function Addon.sendKeystone()
@@ -140,39 +143,39 @@ function Addon.sendKeystone()
 end
 
 function Addon.removePartyKeystone()
-    Addon.trace("removePartyKeystone")
     local tmptable = {}
     local playerinparty = {}
     for i = 1, 4 do
-        local pname, _ = UnitName("party"..i) or "none","none"
-        playerinparty[pname] = true
+        local name, realm = UnitName("party"..i)
+        if not realm then
+            -- unit is on the same realm
+            realm = Addon.Mykey["realm"]
+        end
+        if name then
+            local player = string.format("%s-%s", name, realm)
+            playerinparty[player] = true
+        end
     end
-    playerinparty[Addon.Mykey["name"]] = true
-    Addon.trace(playerinparty)
+    playerinparty[Addon.Mykey["fullname"]] = true
 
     for key in pairs(Addon.PartyKeys) do
-        Addon.trace("Check if ".. key .. " is in party")
         if playerinparty[key] then
-            Addon.trace(playerinparty[key])
-            Addon.trace(" ".. key ..  " in party")
             tmptable[key] = Addon.PartyKeys[key]
-        else
-            Addon.trace(" ".. key ..  " deleted")
         end
     end
     Addon.PartyKeys = tmptable
-    for key in pairs(Addon.PartyKeys) do
-        Addon.trace(key)
-    end
+
 end
 
 function Addon.receiveKeystone(addOnName, message, channel, character)
     if (addOnName == Addon.ShortName) then
-        local key, keylevel, class, fullname = string.split(":", message)
-        Addon.PartyKeys[fullname] = Addon.PartyKeys[fullname] or {}
-        Addon.PartyKeys[fullname]["class"] = class
-        Addon.PartyKeys[fullname]["current_key"] = key
-        Addon.PartyKeys[fullname]["current_keylevel"] = keylevel
+        if channel == "PARTY" then
+            local key, keylevel, class, fullname = string.split(":", message)
+            Addon.PartyKeys[fullname] = Addon.PartyKeys[fullname] or {}
+            Addon.PartyKeys[fullname]["class"] = class
+            Addon.PartyKeys[fullname]["current_key"] = key
+            Addon.PartyKeys[fullname]["current_keylevel"] = keylevel
+        end
     end
     Addon.removePartyKeystone()
 end
@@ -203,18 +206,20 @@ LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("ZONE_CHANGED")
 LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("ZONE_CHANGED_INDOORS")
 LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("CHALLENGE_MODE_MEMBER_INFO_UPDATED")
 LibMythicKeystoneFrames["KeyEvent"]:SetScript("OnEvent", function(self, event, ...)
-    Addon.trace("KeyEvent:" .. event)
     Addon.removePartyKeystone()
     Addon.getKeystone()
     Addon.sendKeystone()
 end)
 
 local function bootlegRepeatingTimer()
-    Addon.trace("Auto refresh")
     Addon.getKeystone()
     Addon.removePartyKeystone()
 	C_Timer.After(60, bootlegRepeatingTimer)
 end
 bootlegRepeatingTimer()
+
+
+
+
 
 _G[ADDON] = lib

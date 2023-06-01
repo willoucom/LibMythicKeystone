@@ -18,3 +18,4 @@ LibMythicKeystone.lua
 # Plugins
 plugin_astralkeys.lua
 plugin_angrykeystones.lua
+plugin_LibDataBroker.lua
