@@ -110,8 +110,8 @@ function Addon.getKeystone()
                 Addon.PartyKeys[player]["name"] = name
                 Addon.PartyKeys[player]["realm"] = realm
                 Addon.PartyKeys[player]["fullname"] = player
-                Addon.PartyKeys[player]["current_key"] = Addon.PartyKeys["current_key"] or ""
-                Addon.PartyKeys[player]["current_keylevel"] = Addon.PartyKeys["current_keylevel"] or ""
+                Addon.PartyKeys[player]["current_key"] = Addon.PartyKeys[player]["current_key"] or 0
+                Addon.PartyKeys[player]["current_keylevel"] = Addon.PartyKeys[player]["current_keylevel"] or 0
             end
         end
     end
