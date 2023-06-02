@@ -1,5 +1,6 @@
 local ADDON, Addon = ...
 
+
 -- For debugging
 
 -- Addon.debug = false
@@ -25,7 +26,7 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
         if Addon.debug then
             print("LMK Debug status : ON")
             local Debug = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
-            Debug:SetPoint("LEFT", 0, 0)
+            Debug:SetPoint("TOPLEFT", 20, -20)
             Debug:SetSize(130, 20)
             Debug:SetMovable(true)
             Debug:EnableMouse(true)
@@ -91,18 +92,7 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             ibutton = ibutton + 1
 
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
-            buttons[ibutton]:SetText("Dump AstralKeys")
-            buttons[ibutton]:SetScript("OnClick", function(self, button)
-                if AstralKeys then
-                    Addon.trace(AstralKeys)
-                else
-                    Addon.trace("AstralKeys not found")
-                end
-            end)
-            ibutton = ibutton + 1
-
-            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
-            buttons[ibutton]:SetText("getKeystone")
+            buttons[ibutton]:SetText("REFRESH Keystone")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 Addon.getKeystone()
             end)
@@ -138,10 +128,25 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             end)
             ibutton = ibutton + 1
 
+
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("showMykey")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
-                Addon.trace(Addon.Mykey)
+                Addon.trace(Addon.lib.getMyKeystone())
+            end)
+            ibutton = ibutton + 1
+
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("showMyAltskey")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                Addon.trace(Addon.lib.getAltsKeystone())
+            end)
+            ibutton = ibutton + 1
+
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("showGuild")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                Addon.trace(Addon.lib.getGuildKeystone())
             end)
             ibutton = ibutton + 1
 
