@@ -50,9 +50,12 @@ function Addon.getKeystone()
     LibMythicKeystoneDB['Guilds'] = LibMythicKeystoneDB['Guilds'] or {};
 
     -- Get character name. guild and realm
-    local pname = UnitName("player") or "none"
-    local sname = GetNormalizedRealmName() or "none"
-    local GuildName = GetGuildInfo("player") or "none"
+    local pname = UnitName("player")
+    if not pname then return end 
+    local realm = GetNormalizedRealmName()
+    if not realm then return end 
+    local GuildName = GetGuildInfo("player")
+    if not GuildName then return end 
     local _, classFilename = C_PlayerInfo.GetClass(PlayerLocation:CreateFromUnit("player"))
 
     -- Create guild storage
@@ -62,17 +65,17 @@ function Addon.getKeystone()
     end
 
     -- Format for storage
-    local player = string.format("%s-%s", pname, sname)
+    local player = string.format("%s-%s", pname, realm)
 
     -- save in database
-    if keystoneLevel then
+    if keystoneLevel and realm then
         LibMythicKeystoneDB['Alts'][player] = {
             ["class"] = classFilename,
             ["current_key"] = keystoneMapID,
             ["current_keylevel"] = keystoneLevel,
             ["guild"] = GuildName,
             ["name"] = pname,
-            ["realm"] = sname,
+            ["realm"] = realm,
             ["fullname"] = player
         }
     end
@@ -80,7 +83,7 @@ function Addon.getKeystone()
     Addon.Mykey = {
         ["class"] = classFilename,
         ["name"] = pname,
-        ["realm"] = sname,
+        ["realm"] = realm,
         ["fullname"] = player,
         ["current_key"] = keystoneMapID,
         ["current_keylevel"] = keystoneLevel
@@ -89,7 +92,7 @@ function Addon.getKeystone()
     Addon.PartyKeys[player] = {
         ["class"] = classFilename,
         ["name"] = pname,
-        ["realm"] = sname,
+        ["realm"] = realm,
         ["fullname"] = player,
         ["current_key"] = keystoneMapID,
         ["current_keylevel"] = keystoneLevel
@@ -123,7 +126,7 @@ function Addon.sendKeystone()
     local data = Addon.Mykey["current_key"] .. ":"
         .. Addon.Mykey["current_keylevel"] .. ":"
         .. Addon.Mykey["class"] .. ":"
-        .. Addon.Mykey["name"]
+        .. Addon.Mykey["fullname"]
     local pname = UnitName("player")
     C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "PARTY")
     -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "WHISPER", pname)
@@ -143,7 +146,6 @@ function Addon.sendKeystone()
 end
 
 function Addon.removePartyKeystone()
-    local tmptable = {}
     local playerinparty = {}
     for i = 1, 4 do
         local name, realm = UnitName("party"..i)
@@ -157,13 +159,12 @@ function Addon.removePartyKeystone()
         end
     end
     playerinparty[Addon.Mykey["fullname"]] = true
-
+    
     for key in pairs(Addon.PartyKeys) do
-        if playerinparty[key] then
-            tmptable[key] = Addon.PartyKeys[key]
+        if not playerinparty[key] then
+            Addon.PartyKeys[key] = nil
         end
     end
-    Addon.PartyKeys = tmptable
 
 end
 

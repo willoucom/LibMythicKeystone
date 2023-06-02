@@ -68,9 +68,11 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("addFakeAlts")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
-                local nobody = "Nobody_" .. math.random(999)
+                _, class = GetClassInfo(math.random(GetNumClasses()))
+                local nobody = class .. "-" .. math.random(999)
                 local tmp = Addon.Mykey
                 tmp["current_key"] = 245
+                tmp["class"] = class
                 tmp["current_keylevel"] = math.random(30)
                 tmp["name"] = nobody
                 tmp["fullname"] = nobody
@@ -83,7 +85,8 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("Reset DB")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
-                LibMythicKeystoneDB = {}
+                LibMythicKeystoneDB['Alts'] = {}
+                LibMythicKeystoneDB['Guilds'] = {}
             end)
             ibutton = ibutton + 1
 
@@ -110,8 +113,10 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 local nobody = "Nobody_" .. math.random(1, 999)
                 Addon.PartyKeys[nobody] = Addon.Mykey
-                Addon.PartyKeys[nobody]["current_keylevel"] = math.random(1, 30)
+                _, class = GetClassInfo(math.random(GetNumClasses()))
+                Addon.PartyKeys[nobody]["current_keylevel"] = math.random(30)
                 Addon.PartyKeys[nobody]["name"] = nobody
+                Addon.PartyKeys[nobody]["class"] = class
                 Addon.PartyKeys[nobody]["current_key"] = 245
             end)
             ibutton = ibutton + 1
@@ -130,6 +135,13 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
                 for key in pairs(Addon.PartyKeys) do
                     Addon.trace(key)
                 end
+            end)
+            ibutton = ibutton + 1
+
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("showMykey")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                Addon.trace(Addon.Mykey)
             end)
             ibutton = ibutton + 1
 

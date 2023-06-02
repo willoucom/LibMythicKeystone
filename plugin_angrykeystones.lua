@@ -7,9 +7,9 @@ local AngryKeystoneStorage = {}
 
 local function OnEvent(self, event, addOnName, message, channel, character)
     if (addOnName == "AngryKeystones") then
-        print("AngryKeystones received")
+        -- print("AngryKeystones received")
         if (string.find(message, "Schedule|")) then
-            print(message)
+            -- print(message)
             local _, key = string.split("|", message)
             local keyname, keylevel = string.split(":", key)
             -- character = string.split("-", character)
@@ -23,12 +23,8 @@ local function OnEvent(self, event, addOnName, message, channel, character)
 
     for key in pairs(AngryKeystoneStorage) do
         Addon.PartyKeys[key] = Addon.PartyKeys[key] or {}
-        if Addon.PartyKeys[key]["current_key"] == 0 then
-            Addon.PartyKeys[key]["current_key"] = AngryKeystoneStorage[key]["current_key"]
-        end
-        if Addon.PartyKeys[key]["current_keylevel"] == 0 then
-            Addon.PartyKeys[key]["current_keylevel"] = AngryKeystoneStorage[key]["current_keylevel"]
-        end
+        Addon.PartyKeys[key]["current_key"] = AngryKeystoneStorage[key]["current_key"]
+        Addon.PartyKeys[key]["current_keylevel"] = AngryKeystoneStorage[key]["current_keylevel"]
     end
 end
 
