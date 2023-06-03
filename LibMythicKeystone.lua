@@ -277,6 +277,12 @@ LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("CHALLENGE_MODE_MEMBER_INFO_UP
 LibMythicKeystoneFrames["KeyEvent"]:SetScript("OnEvent", function(self, event, ...)
     Addon.removePartyKeystone()
     Addon.getKeystone()
+end)
+
+LibMythicKeystoneFrames["SendkeyEvent"] = CreateFrame("Frame", nil, LibMythicKeystoneFrame)
+LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("BAG_UPDATE")
+LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("PLAYER_ENTERING_WORLD")
+LibMythicKeystoneFrames["SendkeyEvent"]:SetScript("OnEvent", function(self, event, ...)
     Addon.sendKeystone()
 end)
 
