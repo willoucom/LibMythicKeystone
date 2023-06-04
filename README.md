@@ -42,3 +42,8 @@ enter command in chat :
 - `/lmk debug off` : disable debug mode
 
 then reload your interface with `/reload`
+
+## Libaries used
+
+- The awesome LibStub https://wowpedia.fandom.com/wiki/LibStub
+- The awesome ChatThrottleLib https://wowpedia.fandom.com/wiki/ChatThrottleLib

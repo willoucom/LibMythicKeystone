@@ -174,23 +174,29 @@ end
 
 function Addon.sendKeystone()
     Addon.getKeystone()
-    local data = Addon.Mykey["current_key"] .. ":"
-        .. Addon.Mykey["current_keylevel"] .. ":"
-        .. Addon.Mykey["class"] .. ":"
-        .. Addon.Mykey["fullname"]
-    local pname = UnitName("player")
-    C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "PARTY")
-    -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "WHISPER", pname)
+    if IsInGroup() then
+        local data = Addon.Mykey["current_key"] .. ":"
+            .. Addon.Mykey["current_keylevel"] .. ":"
+            .. Addon.Mykey["class"] .. ":"
+            .. Addon.Mykey["fullname"]
+        local pname = UnitName("player")
+        -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "PARTY")
+        ChatThrottleLib:SendAddonMessage("NORMAL",  Addon.ShortName, data, "PARTY");
+        -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "GUILD")
+        ChatThrottleLib:SendAddonMessage("NORMAL",  Addon.ShortName, data, "GUILD");
+        -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "WHISPER", pname)
+    end
 
     local guildName = GetGuildInfo("player") or "none"
     if guildName ~= "none" then
-        for key, value in pairs(LibMythicKeystoneDB['Alts']) do
+        for _, value in pairs(LibMythicKeystoneDB['Alts']) do
             if value['guild'] == guildName and value["current_key"] > 0 then
                 local data = value["current_key"] .. ":"
                     .. value["current_keylevel"] .. ":"
                     .. value["class"] .. ":"
                     .. value["fullname"]
-                C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "GUILD")
+                ChatThrottleLib:SendAddonMessage("NORMAL",  Addon.ShortName, data, "GUILD");
+                -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "GUILD")
             end
         end
     end

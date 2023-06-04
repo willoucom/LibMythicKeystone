@@ -9,6 +9,7 @@
 
 #@no-lib-strip@
 libs\LibStub\LibStub.lua
+libs\ChatThrottleLib\ChatThrottleLib.lua
 #@end-no-lib-strip@
 
 # for debug

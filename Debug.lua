@@ -15,6 +15,7 @@ local LibMythicKeystoneDebug = CreateFrame("Frame")
 LibMythicKeystoneDebug:RegisterEvent("ADDON_LOADED")
 LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...)
     if addOnName == "LibMythicKeystone" then
+
         if not LibMythicKeystoneDB["options"] then
             LibMythicKeystoneDB["options"] = {}
         end
@@ -128,7 +129,6 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             end)
             ibutton = ibutton + 1
 
-
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("showMykey")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
@@ -147,6 +147,16 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton]:SetText("showGuild")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 Addon.trace(Addon.lib.getGuildKeystone())
+            end)
+            ibutton = ibutton + 1
+
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("registeredPrefixes")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                local registeredPrefixes = C_ChatInfo.GetRegisteredAddonMessagePrefixes()
+                for _, prefix in pairs(registeredPrefixes)do
+                    Addon.trace(prefix)
+                end
             end)
             ibutton = ibutton + 1
 
