@@ -15,6 +15,7 @@ Addon.Mykey = {
 }
 
 Addon.ProcessingKeys = false
+Addon.SendingKeys = false
 Addon.lib = lib
 
 local initializeTime = {}
@@ -120,7 +121,7 @@ function Addon.getKeystone()
         ["week"] = Addon.GetWeek()
     }
 
-    Addon.PartyKeys[player] = {
+    Addon.PartyKeys[pname] = {
         ["class"] = classFilename,
         ["name"] = pname,
         ["realm"] = realm,
@@ -130,16 +131,17 @@ function Addon.getKeystone()
     }
 
     -- Init group table
-    if IsInGroup() then
+    if IsInGroup() and not IsInRaid() then
         for i = 1, 4 do
-            local name, realm = UnitName("party" .. i) or ""
+            local name, realm = UnitNameUnmodified("party" .. i) or "", nil
             if not realm then
                 -- unit is on the same realm
                 realm = Addon.Mykey["realm"]
             end
-            local player = string.format("%s-%s", name, realm)
-            local _, class = UnitClass("party" .. i)
-            if player ~= "" then
+            if name ~= "" or name ~= UNKNOWNOBJECT then
+                -- local player = string.format("%s-%s", name, realm)
+                local player = name
+                local _, class = UnitClass("party" .. i)
                 Addon.PartyKeys[player] = Addon.PartyKeys[player] or {}
                 Addon.PartyKeys[player]["class"] = class
                 Addon.PartyKeys[player]["name"] = name
@@ -174,53 +176,57 @@ end
 
 function Addon.sendKeystone()
     Addon.getKeystone()
-    if IsInGroup() then
-        local data = Addon.Mykey["current_key"] .. ":"
-            .. Addon.Mykey["current_keylevel"] .. ":"
-            .. Addon.Mykey["class"] .. ":"
-            .. Addon.Mykey["fullname"]
-        local pname = UnitName("player")
-        -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "PARTY")
-        ChatThrottleLib:SendAddonMessage("NORMAL",  Addon.ShortName, data, "PARTY");
-        -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "GUILD")
-        ChatThrottleLib:SendAddonMessage("NORMAL",  Addon.ShortName, data, "GUILD");
-        -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "WHISPER", pname)
-    end
+    if not Addon.SendingKeys then
+        -- this is a mutex
+        Addon.SendingKeys = true
+        if IsInGroup()  and not IsInRaid() then
+            local data = Addon.Mykey["current_key"] .. ":"
+                .. Addon.Mykey["current_keylevel"] .. ":"
+                .. Addon.Mykey["class"] .. ":"
+                .. Addon.Mykey["fullname"]
+            ChatThrottleLib:SendAddonMessage("NORMAL", Addon.ShortName, data, "PARTY");
+        end
 
-    local guildName = GetGuildInfo("player") or "none"
-    if guildName ~= "none" then
-        for _, value in pairs(LibMythicKeystoneDB['Alts']) do
-            if value['guild'] == guildName and value["current_key"] > 0 then
-                local data = value["current_key"] .. ":"
-                    .. value["current_keylevel"] .. ":"
-                    .. value["class"] .. ":"
-                    .. value["fullname"]
-                ChatThrottleLib:SendAddonMessage("NORMAL",  Addon.ShortName, data, "GUILD");
-                -- C_ChatInfo.SendAddonMessage(Addon.ShortName, data, "GUILD")
+        local guildName = GetGuildInfo("player") or "none"
+        if guildName ~= "none" then
+            for _, value in pairs(LibMythicKeystoneDB['Alts']) do
+                if value['guild'] == guildName and value["current_key"] > 0 then
+                    local data = value["current_key"] .. ":"
+                        .. value["current_keylevel"] .. ":"
+                        .. value["class"] .. ":"
+                        .. value["fullname"]
+                    ChatThrottleLib:SendAddonMessage("NORMAL", Addon.ShortName, data, "GUILD");
+                end
             end
+        end
+        Addon.SendingKeys = false
+    end
+end
+
+function Addon.cleanParty(playerinparty) 
+    for key in pairs(Addon.PartyKeys) do
+        if not playerinparty[key] or key == UNKNOWNOBJECT or key == "" then
+            Addon.PartyKeys[key] = nil
         end
     end
 end
 
 function Addon.removePartyKeystone()
+    Addon.getKeystone()
     local playerinparty = {}
-    for i = 1, 4 do
-        local name, realm = UnitName("party" .. i)
-        if not realm then
-            -- unit is on the same realm
-            realm = Addon.Mykey["realm"]
+    if IsInGroup() and not IsInRaid() then
+        for i = 1, 4 do
+            local name = UnitNameUnmodified("party" .. i)
+            if name then
+                playerinparty[name] = true
+            end
         end
-        if name then
-            local player = string.format("%s-%s", name, realm)
-            playerinparty[player] = true
-        end
+        playerinparty[Addon.Mykey["name"]] = true
+        Addon.cleanParty(playerinparty)
     end
-    playerinparty[Addon.Mykey["fullname"]] = true
-
-    for key in pairs(Addon.PartyKeys) do
-        if not playerinparty[key] then
-            Addon.PartyKeys[key] = nil
-        end
+    if not IsInGroup() and not IsInRaid() then
+        playerinparty[Addon.Mykey["name"]] = true
+        Addon.cleanParty(playerinparty)
     end
 end
 
@@ -228,10 +234,11 @@ function Addon.receiveKeystone(addOnName, message, channel, character)
     if (addOnName == Addon.ShortName) then
         if channel == "PARTY" then
             local key, keylevel, class, fullname = string.split(":", message)
-            Addon.PartyKeys[fullname] = Addon.PartyKeys[fullname] or {}
-            Addon.PartyKeys[fullname]["class"] = class
-            Addon.PartyKeys[fullname]["current_key"] = tonumber(key)
-            Addon.PartyKeys[fullname]["current_keylevel"] = tonumber(keylevel)
+            character = string.split("-", fullname)
+            Addon.PartyKeys[character] = Addon.PartyKeys[character] or {}
+            Addon.PartyKeys[character]["class"] = class
+            Addon.PartyKeys[character]["current_key"] = tonumber(key)
+            Addon.PartyKeys[character]["current_keylevel"] = tonumber(keylevel)
         end
         if channel == "GUILD" then
             local key, keylevel, class, fullname = string.split(":", message)
@@ -251,7 +258,6 @@ function Addon.receiveKeystone(addOnName, message, channel, character)
             LibMythicKeystoneDB['Guilds'][GuildName][fullname]["realm"] = realm
         end
     end
-    Addon.removePartyKeystone()
 end
 
 -- Register library for chat msg addon
@@ -273,21 +279,13 @@ LibMythicKeystoneFrames["PartyEvent"]:SetScript("OnEvent",
         end
     end)
 
-LibMythicKeystoneFrames["KeyEvent"] = CreateFrame("Frame", nil, LibMythicKeystoneFrame)
-LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("BAG_UPDATE")
-LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("PLAYER_ENTERING_WORLD")
-LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("GROUP_ROSTER_UPDATE")
-LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("ZONE_CHANGED")
-LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("ZONE_CHANGED_INDOORS")
-LibMythicKeystoneFrames["KeyEvent"]:RegisterEvent("CHALLENGE_MODE_MEMBER_INFO_UPDATED")
-LibMythicKeystoneFrames["KeyEvent"]:SetScript("OnEvent", function(self, event, ...)
-    Addon.removePartyKeystone()
-    Addon.getKeystone()
-end)
-
 LibMythicKeystoneFrames["SendkeyEvent"] = CreateFrame("Frame", nil, LibMythicKeystoneFrame)
-LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("BAG_UPDATE")
 LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("PLAYER_ENTERING_WORLD")
+LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("GROUP_JOINED")
+LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("GROUP_LEFT")
+LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("GROUP_ROSTER_UPDATE")
+LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("CHALLENGE_MODE_MEMBER_INFO_UPDATED")
+LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("ITEM_CHANGED")
 LibMythicKeystoneFrames["SendkeyEvent"]:SetScript("OnEvent", function(self, event, ...)
     Addon.sendKeystone()
 end)
