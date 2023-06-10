@@ -6,6 +6,7 @@
 ## SavedVariables: LibMythicKeystoneDB
 ## IconTexture: 525134
 ## X-Curse-Project-ID: 868244
+## X-Wago-ID: vNAegpNo
 
 #@no-lib-strip@
 libs\LibStub\LibStub.lua
