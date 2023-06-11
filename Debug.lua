@@ -113,6 +113,13 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             ibutton = ibutton + 1
 
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("ChangeMyKey")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                Addon.PartyKeys[Addon.Mykey["name"]]["current_keylevel"] = math.random(30)
+            end)
+            ibutton = ibutton + 1
+
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("removeParty")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 Addon.removePartyKeystone()

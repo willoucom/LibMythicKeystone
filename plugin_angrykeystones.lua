@@ -10,9 +10,9 @@ local function OnEvent(self, event, addOnName, message, channel, character)
         -- print("AngryKeystones received")
         if (string.find(message, "Schedule|")) then
             -- print(message)
-            local _, key = string.split("|", message)
-            local keyname, keylevel = string.split(":", key)
-            local character = string.split("-", character)
+            local _, key = strsplit("|", message)
+            local keyname, keylevel = strsplit(":", key)
+            local character = strsplit("-", character)
             if keyname and keylevel then
                 AngryKeystoneStorage[character] = AngryKeystoneStorage[character] or {}
                 AngryKeystoneStorage[character]["current_key"] = keyname

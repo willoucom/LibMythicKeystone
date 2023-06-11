@@ -179,7 +179,7 @@ function Addon.sendKeystone()
     if not Addon.SendingKeys then
         -- this is a mutex
         Addon.SendingKeys = true
-        if IsInGroup()  and not IsInRaid() then
+        if IsInGroup() and not IsInRaid() then
             local data = Addon.Mykey["current_key"] .. ":"
                 .. Addon.Mykey["current_keylevel"] .. ":"
                 .. Addon.Mykey["class"] .. ":"
@@ -203,7 +203,7 @@ function Addon.sendKeystone()
     end
 end
 
-function Addon.cleanParty(playerinparty) 
+function Addon.cleanParty(playerinparty)
     for key in pairs(Addon.PartyKeys) do
         if not playerinparty[key] or key == UNKNOWNOBJECT or key == "" then
             Addon.PartyKeys[key] = nil
@@ -233,16 +233,16 @@ end
 function Addon.receiveKeystone(addOnName, message, channel, character)
     if (addOnName == Addon.ShortName) then
         if channel == "PARTY" then
-            local key, keylevel, class, fullname = string.split(":", message)
-            character = string.split("-", fullname)
+            local key, keylevel, class, fullname = strsplit(":", message)
+            character = strsplit("-", fullname)
             Addon.PartyKeys[character] = Addon.PartyKeys[character] or {}
             Addon.PartyKeys[character]["class"] = class
             Addon.PartyKeys[character]["current_key"] = tonumber(key)
             Addon.PartyKeys[character]["current_keylevel"] = tonumber(keylevel)
         end
         if channel == "GUILD" then
-            local key, keylevel, class, fullname = string.split(":", message)
-            local name, realm = string.split("-", fullname)
+            local key, keylevel, class, fullname = strsplit(":", message)
+            local name, realm = strsplit("-", fullname)
             local GuildName = GetGuildInfo("player") or "none"
             if not GuildName then return end
             LibMythicKeystoneDB['Guilds'] = LibMythicKeystoneDB['Guilds'] or {}

@@ -9,7 +9,7 @@ f:SetScript("OnEvent", function(self, event, addOnName, ...)
         LibMythicKeystoneDB['Guilds'][GuildName] = LibMythicKeystoneDB['Guilds'][GuildName] or {}
         for _, value in pairs(AstralKeys) do
             if value['source'] == "guild" then
-                local name, realm = string.split("-",value['unit'])
+                local name, realm = strsplit("-",value['unit'])
                 LibMythicKeystoneDB['Guilds'][GuildName][value['unit']] = LibMythicKeystoneDB['Guilds'][GuildName][value['unit']] or {}
                 LibMythicKeystoneDB['Guilds'][GuildName][value['unit']]["class"] = LibMythicKeystoneDB['Guilds'][GuildName][value['unit']]["class"] or value["class"]
                 LibMythicKeystoneDB['Guilds'][GuildName][value['unit']]["current_key"] = LibMythicKeystoneDB['Guilds'][GuildName][value['unit']]["current_key"] or value["dungeon_id"]
