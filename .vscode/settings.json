@@ -389,6 +389,7 @@
         "BACKDROP_CHARACTER_CREATE_TOOLTIP_32_32",
         "BACKDROP_DIALOG_32_32",
         "NUM_BAG_FRAMES",
-        "AstralKeys"
+        "AstralKeys",
+        "RegisterAddonMessagePrefix"
     ]
 }
