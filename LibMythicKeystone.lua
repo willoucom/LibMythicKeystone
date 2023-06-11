@@ -184,7 +184,7 @@ function Addon.sendKeystone()
                 .. Addon.Mykey["current_keylevel"] .. ":"
                 .. Addon.Mykey["class"] .. ":"
                 .. Addon.Mykey["fullname"]
-            ChatThrottleLib:SendAddonMessage("NORMAL", Addon.ShortName, data, "PARTY");
+            ChatThrottleLib:SendAddonMessage("NORMAL", Addon.ShortName, data, "PARTY")
         end
 
         local guildName = GetGuildInfo("player") or "none"
@@ -195,7 +195,7 @@ function Addon.sendKeystone()
                         .. value["current_keylevel"] .. ":"
                         .. value["class"] .. ":"
                         .. value["fullname"]
-                    ChatThrottleLib:SendAddonMessage("NORMAL", Addon.ShortName, data, "GUILD");
+                    ChatThrottleLib:SendAddonMessage("NORMAL", Addon.ShortName, data, "GUILD")
                 end
             end
         end
@@ -287,11 +287,12 @@ LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("GROUP_ROSTER_UPDATE")
 LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("CHALLENGE_MODE_MEMBER_INFO_UPDATED")
 LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("ITEM_CHANGED")
 LibMythicKeystoneFrames["SendkeyEvent"]:SetScript("OnEvent", function(self, event, ...)
-    Addon.sendKeystone()
+    C_Timer.After(5, Addon.sendKeystone)
 end)
 
 local function bootlegRepeatingTimer()
     Addon.ProcessingKeys = false
+    Addon.SendingKeysKeys = false
     C_Timer.After(60, bootlegRepeatingTimer)
 end
 bootlegRepeatingTimer()
