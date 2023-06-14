@@ -165,7 +165,6 @@ function Addon.getKeystone()
     -- Clean obsolete keys (Alts)
     for char in pairs(LibMythicKeystoneDB['Alts']) do
         if LibMythicKeystoneDB['Alts'][char]['week'] ~= Addon.GetWeek() then
-            print(LibMythicKeystoneDB['Alts'][char]['week'])
             LibMythicKeystoneDB['Alts'][char] = nil
         end
     end
