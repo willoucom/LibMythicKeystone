@@ -2,6 +2,7 @@ local ADDON, Addon = ...
 local MAJOR, MINOR = "LibMythicKeystone-1.0", 1;
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
+local CTL = assert(ChatThrottleLib, "AceComm-3.0 requires ChatThrottleLib")
 
 Addon.ShortName = "MythicKeystone"
 Addon.PartyKeys = {}
@@ -183,7 +184,7 @@ function Addon.sendKeystone()
                 .. Addon.Mykey["current_keylevel"] .. ":"
                 .. Addon.Mykey["class"] .. ":"
                 .. Addon.Mykey["fullname"]
-            ChatThrottleLib:SendAddonMessage("NORMAL", Addon.ShortName, data, "PARTY")
+                CTL:SendAddonMessage("NORMAL", Addon.ShortName, data, "PARTY")
         end
 
         local guildName = GetGuildInfo("player") or "none"
@@ -194,7 +195,7 @@ function Addon.sendKeystone()
                         .. value["current_keylevel"] .. ":"
                         .. value["class"] .. ":"
                         .. value["fullname"]
-                    ChatThrottleLib:SendAddonMessage("NORMAL", Addon.ShortName, data, "GUILD")
+                        CTL:SendAddonMessage("NORMAL", Addon.ShortName, data, "GUILD")
                 end
             end
         end
