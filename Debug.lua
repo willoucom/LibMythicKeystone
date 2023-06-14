@@ -42,7 +42,7 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             tex:SetAlpha(0.5);
 
             local buttons = {}
-            local ibutton = 0
+            local ibutton = 1
 
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("Disable DEBUG")
@@ -167,9 +167,26 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             end)
             ibutton = ibutton + 1
 
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("request Keystone")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                Addon.requestGuildKeystone()
+            end)
+            ibutton = ibutton + 1
+
+            local startxpos = 0
+            local startypos = 0
+            local i = 0
             for key in pairs(buttons) do
-                local startpos = -20 - 40 * key
-                buttons[key]:SetPoint("TOPLEFT", 0, startpos or 0)
+                if (key%2 ~= 0) then
+                    startxpos = -10 - 40 * i
+                    startypos = 0
+                    i = i + 1
+                else 
+                    startypos = 130
+                end
+                print(key .. " " .. startxpos .. "|" .. startypos)
+                buttons[key]:SetPoint("TOPLEFT", startypos or 0, startxpos or 0)
                 buttons[key]:SetSize(130, 40)
             end
         end

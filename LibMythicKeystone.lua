@@ -183,14 +183,17 @@ function Addon.sendKeystone()
     if not Addon.SendingKeys then
         -- this is a mutex
         Addon.SendingKeys = true
+
+        -- Sending to group
         if IsInGroup() and not IsInRaid() then
             local data = Addon.Mykey["current_key"] .. ":"
                 .. Addon.Mykey["current_keylevel"] .. ":"
                 .. Addon.Mykey["class"] .. ":"
                 .. Addon.Mykey["fullname"]
-                CTL:SendAddonMessage("NORMAL", Addon.ShortName, data, "PARTY")
+            CTL:SendAddonMessage("NORMAL", Addon.ShortName, data, "PARTY")
         end
 
+        -- Sending to guild
         local guildName = GetGuildInfo("player") or "none"
         if guildName ~= "none" then
             for _, value in pairs(LibMythicKeystoneDB['Alts']) do
@@ -199,10 +202,11 @@ function Addon.sendKeystone()
                         .. value["current_keylevel"] .. ":"
                         .. value["class"] .. ":"
                         .. value["fullname"]
-                        CTL:SendAddonMessage("NORMAL", Addon.ShortName, data, "GUILD")
+                    CTL:SendAddonMessage("NORMAL", Addon.ShortName, data, "GUILD")
                 end
             end
         end
+        -- this is also a mutex
         Addon.SendingKeys = false
     end
 end
@@ -215,35 +219,44 @@ function Addon.cleanParty(playerinparty)
     end
 end
 
-
 function Addon.receiveKeystone(addOnName, message, channel, character)
     if (addOnName == Addon.ShortName) then
         if channel == "PARTY" then
-            local key, keylevel, class, fullname = strsplit(":", message)
-            character = strsplit("-", fullname)
-            Addon.PartyKeys[character] = Addon.PartyKeys[character] or {}
-            Addon.PartyKeys[character]["class"] = class
-            Addon.PartyKeys[character]["current_key"] = tonumber(key)
-            Addon.PartyKeys[character]["current_keylevel"] = tonumber(keylevel)
+            if string.match(message, ":") then
+                local key, keylevel, class, fullname = strsplit(":", message)
+                character = strsplit("-", fullname)
+                Addon.PartyKeys[character] = Addon.PartyKeys[character] or {}
+                Addon.PartyKeys[character]["class"] = class
+                Addon.PartyKeys[character]["current_key"] = tonumber(key)
+                Addon.PartyKeys[character]["current_keylevel"] = tonumber(keylevel)
+            end
         end
         if channel == "GUILD" then
-            local key, keylevel, class, fullname = strsplit(":", message)
-            local name, realm = strsplit("-", fullname)
-            local GuildName = GetGuildInfo("player") or "none"
-            if not GuildName then return end
-            LibMythicKeystoneDB['Guilds'] = LibMythicKeystoneDB['Guilds'] or {}
-            LibMythicKeystoneDB['Guilds'][GuildName] = LibMythicKeystoneDB['Guilds'][GuildName] or {}
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname] = LibMythicKeystoneDB['Guilds'][GuildName][fullname] or {}
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname]["fullname"] = fullname
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname]["week"] = Addon.GetWeek()
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname]["guild"] = GuildName
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname]["current_key"] = tonumber(key)
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname]["current_keylevel"] = tonumber(keylevel)
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname]["class"] = class
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname]["name"] = name
-            LibMythicKeystoneDB['Guilds'][GuildName][fullname]["realm"] = realm
+            if message == "requestGuildKeystone" then
+                Addon.sendKeystone()
+            elseif string.match(message, ":") then
+                local key, keylevel, class, fullname = strsplit(":", message)
+                local name, realm = strsplit("-", fullname)
+                local GuildName = GetGuildInfo("player") or "none"
+                if not GuildName then return end
+                LibMythicKeystoneDB['Guilds'] = LibMythicKeystoneDB['Guilds'] or {}
+                LibMythicKeystoneDB['Guilds'][GuildName] = LibMythicKeystoneDB['Guilds'][GuildName] or {}
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname] = LibMythicKeystoneDB['Guilds'][GuildName][fullname] or {}
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname]["fullname"] = fullname
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname]["week"] = Addon.GetWeek()
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname]["guild"] = GuildName
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname]["current_key"] = tonumber(key)
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname]["current_keylevel"] = tonumber(keylevel)
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname]["class"] = class
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname]["name"] = name
+                LibMythicKeystoneDB['Guilds'][GuildName][fullname]["realm"] = realm
+            end
         end
     end
+end
+
+function Addon.requestGuildKeystone()
+    CTL:SendAddonMessage("NORMAL", Addon.ShortName, "requestGuildKeystone", "GUILD")
 end
 
 -- Register library for chat msg addon
@@ -264,6 +277,12 @@ LibMythicKeystoneFrames["PartyEvent"]:SetScript("OnEvent",
             Addon.receiveKeystone(addOnName, message, channel, character)
         end
     end)
+
+LibMythicKeystoneFrames["RequestGuildKeyEvent"] = CreateFrame("Frame", nil, LibMythicKeystoneFrame)
+LibMythicKeystoneFrames["RequestGuildKeyEvent"]:RegisterEvent("PLAYER_ENTERING_WORLD")
+LibMythicKeystoneFrames["RequestGuildKeyEvent"]:SetScript("OnEvent", function(self, event, ...)
+    C_Timer.After(10, Addon.requestGuildKeystone)
+end)
 
 LibMythicKeystoneFrames["SendkeyEvent"] = CreateFrame("Frame", nil, LibMythicKeystoneFrame)
 LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("PLAYER_ENTERING_WORLD")
