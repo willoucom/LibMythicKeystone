@@ -131,9 +131,10 @@ function Addon.getKeystone()
         ["current_keylevel"] = keystoneLevel
     }
 
+    local playerinparty = {}
     -- Init group table
     if IsInGroup() and not IsInRaid() then
-        for i = 1, 4 do
+        for i = 1, GetNumGroupMembers() do
             local name, realm = UnitNameUnmodified("party" .. i) or "", nil
             if not realm then
                 -- unit is on the same realm
@@ -150,9 +151,12 @@ function Addon.getKeystone()
                 Addon.PartyKeys[player]["fullname"] = player
                 Addon.PartyKeys[player]["current_key"] = Addon.PartyKeys[player]["current_key"] or 0
                 Addon.PartyKeys[player]["current_keylevel"] = Addon.PartyKeys[player]["current_keylevel"] or 0
+                playerinparty[player] = true
             end
         end
     end
+    playerinparty[Addon.Mykey["name"]] = true
+    Addon.cleanParty(playerinparty)
 
     -- Clean obsolete keys (Guild)
     for guild in pairs(LibMythicKeystoneDB['Guilds']) do
@@ -211,24 +215,6 @@ function Addon.cleanParty(playerinparty)
     end
 end
 
-function Addon.removePartyKeystone()
-    Addon.getKeystone()
-    local playerinparty = {}
-    if IsInGroup() and not IsInRaid() then
-        for i = 1, 4 do
-            local name = UnitNameUnmodified("party" .. i)
-            if name then
-                playerinparty[name] = true
-            end
-        end
-        playerinparty[Addon.Mykey["name"]] = true
-        Addon.cleanParty(playerinparty)
-    end
-    if not IsInGroup() and not IsInRaid() then
-        playerinparty[Addon.Mykey["name"]] = true
-        Addon.cleanParty(playerinparty)
-    end
-end
 
 function Addon.receiveKeystone(addOnName, message, channel, character)
     if (addOnName == Addon.ShortName) then
@@ -287,7 +273,7 @@ LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("GROUP_ROSTER_UPDATE")
 LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("CHALLENGE_MODE_MEMBER_INFO_UPDATED")
 LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("ITEM_CHANGED")
 LibMythicKeystoneFrames["SendkeyEvent"]:SetScript("OnEvent", function(self, event, ...)
-    C_Timer.After(5, Addon.sendKeystone)
+    C_Timer.After(10, Addon.sendKeystone)
 end)
 
 local function bootlegRepeatingTimer()
@@ -300,7 +286,6 @@ bootlegRepeatingTimer()
 local f = CreateFrame("Frame")
 f:SetScript("OnUpdate", function(self, elap)
     Addon.getKeystone()
-    Addon.removePartyKeystone()
 end)
 
 
