@@ -185,7 +185,7 @@ function Addon.sendKeystone()
         Addon.SendingKeys = true
 
         -- Sending to group
-        if IsInGroup() and not IsInRaid() then
+        if IsInGroup(LE_PARTY_CATEGORY_HOME) and not IsInRaid() then
             local data = Addon.Mykey["current_key"] .. ":"
                 .. Addon.Mykey["current_keylevel"] .. ":"
                 .. Addon.Mykey["class"] .. ":"
