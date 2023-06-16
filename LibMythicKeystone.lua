@@ -222,7 +222,9 @@ end
 function Addon.receiveKeystone(addOnName, message, channel, character)
     if (addOnName == Addon.ShortName) then
         if channel == "PARTY" then
-            if string.match(message, ":") then
+            if message == "requestPartyKeystone" then
+                Addon.sendKeystone()
+            elseif string.match(message, ":") then
                 local key, keylevel, class, fullname = strsplit(":", message)
                 character = strsplit("-", fullname)
                 Addon.PartyKeys[character] = Addon.PartyKeys[character] or {}
@@ -259,6 +261,10 @@ function Addon.requestGuildKeystone()
     CTL:SendAddonMessage("NORMAL", Addon.ShortName, "requestGuildKeystone", "GUILD")
 end
 
+function Addon.requestPartyKeystone()
+    CTL:SendAddonMessage("NORMAL", Addon.ShortName, "requestPartyKeystone", "GUILD")
+end
+
 -- Register library for chat msg addon
 C_ChatInfo.RegisterAddonMessagePrefix(Addon.ShortName)
 
@@ -293,6 +299,7 @@ LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("CHALLENGE_MODE_MEMBER_INF
 LibMythicKeystoneFrames["SendkeyEvent"]:RegisterEvent("ITEM_CHANGED")
 LibMythicKeystoneFrames["SendkeyEvent"]:SetScript("OnEvent", function(self, event, ...)
     C_Timer.After(10, Addon.sendKeystone)
+    C_Timer.After(10, Addon.requestPartyKeystone)
 end)
 
 local function bootlegRepeatingTimer()
