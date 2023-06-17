@@ -131,32 +131,32 @@ function Addon.getKeystone()
         ["current_keylevel"] = keystoneLevel
     }
 
-    local playerinparty = {}
     -- Init group table
-    if IsInGroup() and not IsInRaid() then
-        for i = 1, GetNumGroupMembers() do
-            local name, realm = UnitNameUnmodified("party" .. i) or "", nil
+    local tempkeys = {}
+    tempkeys[Addon.Mykey["name"]] = Addon.Mykey
+    if IsInGroup(LE_PARTY_CATEGORY_HOME) then
+        for i = 1, 4 do
+            local name, realm = UnitNameUnmodified("party" .. i) or nil, nil
+            local _, class = UnitClass("party" .. i)
             if not realm then
                 -- unit is on the same realm
                 realm = Addon.Mykey["realm"]
             end
-            if name ~= "" or name ~= UNKNOWNOBJECT then
-                -- local player = string.format("%s-%s", name, realm)
-                local player = name
-                local _, class = UnitClass("party" .. i)
-                Addon.PartyKeys[player] = Addon.PartyKeys[player] or {}
-                Addon.PartyKeys[player]["class"] = class
-                Addon.PartyKeys[player]["name"] = name
-                Addon.PartyKeys[player]["realm"] = realm
-                Addon.PartyKeys[player]["fullname"] = player
-                Addon.PartyKeys[player]["current_key"] = Addon.PartyKeys[player]["current_key"] or 0
-                Addon.PartyKeys[player]["current_keylevel"] = Addon.PartyKeys[player]["current_keylevel"] or 0
-                playerinparty[player] = true
+            if name then
+                tempkeys[name] = {}
+                tempkeys[name]["class"] = class
+                tempkeys[name]["name"] = name
+                tempkeys[name]["realm"] = realm
+                tempkeys[name]["current_key"] = 0
+                tempkeys[name]["current_keylevel"] = 0
+                if Addon.PartyKeys[name] then
+                    tempkeys[name]["current_key"] = Addon.PartyKeys[name]["current_key"] or 0
+                    tempkeys[name]["current_keylevel"] = Addon.PartyKeys[name]["current_keylevel"] or 0
+                end
             end
         end
     end
-    playerinparty[Addon.Mykey["name"]] = true
-    Addon.cleanParty(playerinparty)
+    Addon.PartyKeys = tempkeys
 
     -- Clean obsolete keys (Guild)
     for guild in pairs(LibMythicKeystoneDB['Guilds']) do
