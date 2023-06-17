@@ -103,26 +103,16 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton]:SetText("addFakeParty")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 local nobody = "Nobody_" .. math.random(1, 999)
-                Addon.PartyKeys[nobody] = Addon.Mykey
+                Addon.PartyKeys[nobody] = {}
                 _, class = GetClassInfo(math.random(GetNumClasses()))
                 Addon.PartyKeys[nobody]["current_keylevel"] = math.random(30)
                 Addon.PartyKeys[nobody]["name"] = nobody
                 Addon.PartyKeys[nobody]["class"] = class
                 Addon.PartyKeys[nobody]["current_key"] = 245
-            end)
-            ibutton = ibutton + 1
-
-            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
-            buttons[ibutton]:SetText("ChangeMyKey")
-            buttons[ibutton]:SetScript("OnClick", function(self, button)
-                Addon.PartyKeys[Addon.Mykey["name"]]["current_keylevel"] = math.random(30)
-            end)
-            ibutton = ibutton + 1
-
-            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
-            buttons[ibutton]:SetText("removeParty")
-            buttons[ibutton]:SetScript("OnClick", function(self, button)
-                Addon.removePartyKeystone()
+                Addon.trace(Addon.PartyKeys)
+                for key in pairs(Addon.PartyKeys) do
+                    Addon.trace(key)
+                end
             end)
             ibutton = ibutton + 1
 
@@ -158,21 +148,32 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             ibutton = ibutton + 1
 
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
-            buttons[ibutton]:SetText("registeredPrefixes")
+            buttons[ibutton]:SetText("request Keystone")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
-                local registeredPrefixes = C_ChatInfo.GetRegisteredAddonMessagePrefixes()
-                for _, prefix in pairs(registeredPrefixes)do
-                    Addon.trace(prefix)
+                Addon.requestGuildKeystone()
+                Addon.requestPartyKeystone()
+            end)
+            ibutton = ibutton + 1
+
+
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("homePlayers")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                local homePlayers = GetHomePartyInfo()
+                Addon.trace(homePlayers)
+                if homePlayers then
+                    for _, name in pairs(homePlayers) do
+                        -- local name, realm = strsplit("-", name)
+                        -- print(name)
+                        Addon.trace(UnitName(name))
+                        local _, class = UnitClass(name)
+                        Addon.trace(UnitName(class))
+                    end
                 end
             end)
             ibutton = ibutton + 1
 
-            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
-            buttons[ibutton]:SetText("request Keystone")
-            buttons[ibutton]:SetScript("OnClick", function(self, button)
-                Addon.requestGuildKeystone()
-            end)
-            ibutton = ibutton + 1
+
 
             local startxpos = 0
             local startypos = 0
@@ -185,7 +186,6 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
                 else 
                     startypos = 130
                 end
-                print(key .. " " .. startxpos .. "|" .. startypos)
                 buttons[key]:SetPoint("TOPLEFT", startypos or 0, startxpos or 0)
                 buttons[key]:SetSize(130, 40)
             end
