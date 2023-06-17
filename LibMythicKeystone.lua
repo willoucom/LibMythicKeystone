@@ -211,14 +211,6 @@ function Addon.sendKeystone()
     end
 end
 
-function Addon.cleanParty(playerinparty)
-    for key in pairs(Addon.PartyKeys) do
-        if not playerinparty[key] or key == UNKNOWNOBJECT or key == "" then
-            Addon.PartyKeys[key] = nil
-        end
-    end
-end
-
 function Addon.receiveKeystone(addOnName, message, channel, character)
     if (addOnName == Addon.ShortName) then
         if channel == "PARTY" then
