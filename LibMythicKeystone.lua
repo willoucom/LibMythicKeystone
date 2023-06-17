@@ -250,11 +250,15 @@ function Addon.receiveKeystone(addOnName, message, channel, character)
 end
 
 function Addon.requestGuildKeystone()
+    local GuildName = GetGuildInfo("player") or "none"
+    if not GuildName then return end
     CTL:SendAddonMessage("NORMAL", Addon.ShortName, "requestGuildKeystone", "GUILD")
 end
 
 function Addon.requestPartyKeystone()
-    CTL:SendAddonMessage("NORMAL", Addon.ShortName, "requestPartyKeystone", "GUILD")
+    if IsInGroup(LE_PARTY_CATEGORY_HOME) and not IsInRaid() then
+        CTL:SendAddonMessage("NORMAL", Addon.ShortName, "requestPartyKeystone", "PARTY")
+    end
 end
 
 -- Register library for chat msg addon
