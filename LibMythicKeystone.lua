@@ -98,20 +98,6 @@ function Addon.getKeystone()
     -- Format for storage
     local player = string.format("%s-%s", pname, realm)
 
-    -- save in database
-    if keystoneLevel > 0 and realm then
-        LibMythicKeystoneDB['Alts'][player] = {
-            ["class"] = classFilename,
-            ["current_key"] = keystoneMapID,
-            ["current_keylevel"] = keystoneLevel,
-            ["guild"] = GuildName,
-            ["name"] = pname,
-            ["realm"] = realm,
-            ["fullname"] = player,
-            ["week"] = Addon.GetWeek()
-        }
-    end
-
     Addon.Mykey = {
         ["class"] = classFilename,
         ["name"] = pname,
@@ -130,6 +116,16 @@ function Addon.getKeystone()
         ["current_key"] = keystoneMapID,
         ["current_keylevel"] = keystoneLevel
     }
+
+    -- save in database
+    if keystoneLevel > 0 and realm then
+        -- save in alts
+        LibMythicKeystoneDB['Alts'][player] = Addon.Mykey
+        -- save in guild
+        if GuildName ~= "none" then
+            LibMythicKeystoneDB['Guilds'][GuildName][player] = Addon.Mykey
+        end
+    end
 
     -- Init group table
     local tempkeys = {}
