@@ -231,7 +231,7 @@ function Addon.receiveKeystone(addOnName, message, channel, character)
             elseif string.match(message, ":") then
                 local key, keylevel, class, fullname = strsplit(":", message)
                 local name, realm = strsplit("-", fullname)
-                local GuildName = GetGuildInfo("player") or "none"
+                local GuildName = GetGuildInfo("player")
                 if not GuildName then return end
                 LibMythicKeystoneDB['Guilds'] = LibMythicKeystoneDB['Guilds'] or {}
                 LibMythicKeystoneDB['Guilds'][GuildName] = LibMythicKeystoneDB['Guilds'][GuildName] or {}
