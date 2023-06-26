@@ -21,5 +21,6 @@ f:SetScript("OnEvent", function(self, event, addOnName, ...)
                 LibMythicKeystoneDB['Guilds'][GuildName][value['unit']]["fullname"] = LibMythicKeystoneDB['Guilds'][GuildName][value['unit']]["fullname"] or value["unit"]
             end
         end
+        f:UnregisterEvent("ADDON_LOADED")
     end
 end)
