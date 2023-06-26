@@ -250,7 +250,7 @@ function Addon.receiveKeystone(addOnName, message, channel, character)
 end
 
 function Addon.requestGuildKeystone()
-    local GuildName = GetGuildInfo("player") or "none"
+    local GuildName = GetGuildInfo("player")
     if not GuildName then return end
     CTL:SendAddonMessage("NORMAL", Addon.ShortName, "requestGuildKeystone", "GUILD")
 end
