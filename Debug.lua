@@ -2,9 +2,6 @@ local ADDON, Addon = ...
 
 
 -- For debugging
-
--- Addon.debug = false
-
 function Addon.trace(o)
     if Addon.debug then
         DevTools_Dump(o)
@@ -15,7 +12,6 @@ local LibMythicKeystoneDebug = CreateFrame("Frame")
 LibMythicKeystoneDebug:RegisterEvent("ADDON_LOADED")
 LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...)
     if addOnName == "LibMythicKeystone" then
-
         if not LibMythicKeystoneDB["options"] then
             LibMythicKeystoneDB["options"] = {}
         end
