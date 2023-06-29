@@ -137,6 +137,24 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             ibutton = ibutton + 1
 
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("addFakeGuild")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                local guild = GetGuildInfo("player") or "none"
+                local _, classFilename = C_PlayerInfo.GetClass(PlayerLocation:CreateFromUnit("player"))
+                local char = "toto"
+                LibMythicKeystoneDB['Guilds'][guild][char] = {
+                    ["class"] = classFilename,
+                    ["name"] = char,
+                    ["realm"] = char,
+                    ["fullname"] = char,
+                    ["current_key"] = 404,
+                    ["current_keylevel"] = 10,
+                    ["week"] = Addon.GetWeek()
+                }
+            end)
+            ibutton = ibutton + 1
+
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("showGuild")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 Addon.trace(Addon.lib.getGuildKeystone())
@@ -169,7 +187,12 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             end)
             ibutton = ibutton + 1
 
-
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("Get Week")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                Addon.trace(Addon.GetWeek())
+            end)
+            ibutton = ibutton + 1
 
             local startxpos = 0
             local startypos = 0
