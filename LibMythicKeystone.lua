@@ -104,6 +104,7 @@ function Addon.getKeystone()
         ["realm"] = realm,
         ["fullname"] = player,
         ["current_key"] = keystoneMapID,
+        ["guild"] = GuildName,
         ["current_keylevel"] = keystoneLevel,
         ["week"] = Addon.GetWeek()
     }
