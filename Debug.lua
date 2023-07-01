@@ -191,6 +191,7 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton]:SetText("Get Week")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 Addon.trace(Addon.GetWeek())
+                Addon.trace(C_WeeklyRewards.GetActivities(1))
             end)
             ibutton = ibutton + 1
 

@@ -105,8 +105,17 @@ function Addon.getKeystone()
         ["current_key"] = keystoneMapID,
         ["guild"] = GuildName,
         ["current_keylevel"] = keystoneLevel,
-        ["week"] = Addon.GetWeek()
+        ["week"] = Addon.GetWeek(),
+        ["weeklybest"] = 0,
+        ["weeklycount"] = 0
     }
+
+    -- Get Number of runs this week
+    local rewards = C_WeeklyRewards.GetActivities(1)
+    -- Get num runs
+    Addon.Mykey["weeklycount"] = rewards[1]["progress"]
+    -- Get best runs
+    Addon.Mykey["weeklybest"] = rewards[1]["level"]
 
     Addon.PartyKeys[pname] = {
         ["class"] = classFilename,
