@@ -1,4 +1,4 @@
-## Interface: 100105
+## Interface: 110002
 ## Title: LibMythicKeystone
 ## Version: @project-version@
 ## Notes: Libary for Mythic Keystone
