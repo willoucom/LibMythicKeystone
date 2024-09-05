@@ -111,11 +111,13 @@ function Addon.getKeystone()
     }
 
     -- Get Number of runs this week
-    local rewards = C_WeeklyRewards.GetActivities(1)
-    -- Get num runs
-    Addon.Mykey["weeklycount"] = rewards[1]["progress"]
-    -- Get best runs
-    Addon.Mykey["weeklybest"] = rewards[1]["level"]
+    local rewards = C_WeeklyRewards.GetActivities(1) or {[1] = {["progress"] = 0, ["level"] = 0}}
+    if rewards[1] and rewards[1]["progress"] and rewards[1]["level"] then
+        -- Get num runs
+        Addon.Mykey["weeklycount"] = rewards[1]["progress"] or 0
+        -- Get best runs
+        Addon.Mykey["weeklybest"] = rewards[1]["level"] or 0
+    end
 
     Addon.PartyKeys[pname] = {
         ["class"] = classFilename,
