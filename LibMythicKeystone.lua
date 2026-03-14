@@ -295,16 +295,8 @@ LibMythicKeystoneFrames["SendkeyEvent"]:SetScript("OnEvent", function(self, even
     C_Timer.After(10, Addon.requestGuildKeystone)
 end)
 
-local function bootlegRepeatingTimer()
-    Addon.ProcessingKeys = false
-    C_Timer.After(60, bootlegRepeatingTimer)
-end
-bootlegRepeatingTimer()
-
-local f = CreateFrame("Frame")
-f:SetScript("OnUpdate", function(self, elap)
-    Addon.getKeystone()
-end)
+C_Timer.After(1, Addon.getKeystone)
+C_Timer.NewTicker(60, function() Addon.getKeystone() end)
 
 
 
