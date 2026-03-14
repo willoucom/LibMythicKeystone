@@ -30,12 +30,19 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             Debug:RegisterForDrag("LeftButton")
             Debug:SetScript("OnDragStart", Debug.StartMoving)
             Debug:SetScript("OnDragStop", Debug.StopMovingOrSizing)
-            -- The code below makes the frame visible, and is not necessary to enable dragging.
-            Debug:SetPoint("CENTER");
-            local tex = Debug:CreateTexture("ARTWORK");
-            tex:SetAllPoints();
-            tex:SetTexture(1.0);
-            tex:SetAlpha(0.5);
+            Debug.tex = Debug:CreateTexture("ARTWORK")
+            Debug.tex:SetAllPoints();
+            Debug.tex:SetTexture(1.0);
+            Debug.tex:SetAlpha(0.5);
+
+            local blackscreen = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+            blackscreen:SetPoint("TOPLEFT", 0, 0)
+            blackscreen:SetSize(9000, 9000)
+            blackscreen.tex = blackscreen:CreateTexture("ARTWORK")
+            blackscreen.tex:SetAllPoints(blackscreen)
+            blackscreen.tex:SetColorTexture(0, 0, 0, 1)
+            blackscreen.tex:SetAlpha(1);
+            blackscreen:Hide()
 
             local buttons = {}
             local ibutton = 1
@@ -57,6 +64,19 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             ibutton = ibutton + 1
 
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
+            buttons[ibutton]:SetText("Black Screen")
+            buttons[ibutton]:SetScript("OnClick", function(self, button)
+                if blackscreen:IsVisible() then
+                    blackscreen:Hide()
+                else
+                    blackscreen:Show()
+                end
+            end)
+            ibutton = ibutton + 1
+
+
+
+            buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("sendKeystone")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 Addon.sendKeystone()
@@ -66,17 +86,15 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("addFakeAlts")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
-                _, class = GetClassInfo(math.random(GetNumClasses()))
+                local _, class = GetClassInfo(math.random(GetNumClasses()))
                 local nobody = class .. "-" .. math.random(999)
-                local tmp = Addon.Mykey
+                local tmp = CopyTable(Addon.Mykey)
                 tmp["current_key"] = 245
                 tmp["class"] = class
                 tmp["current_keylevel"] = math.random(30)
                 tmp["name"] = nobody
                 tmp["fullname"] = nobody
                 LibMythicKeystoneDB["Alts"][nobody] = tmp
-                nobody = ""
-                tmp = {}
             end)
             ibutton = ibutton + 1
 
@@ -100,7 +118,7 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton]:SetScript("OnClick", function(self, button)
                 local nobody = "Nobody_" .. math.random(1, 999)
                 Addon.PartyKeys[nobody] = {}
-                _, class = GetClassInfo(math.random(GetNumClasses()))
+                local _, class = GetClassInfo(math.random(GetNumClasses()))
                 Addon.PartyKeys[nobody]["current_keylevel"] = math.random(30)
                 Addon.PartyKeys[nobody]["name"] = nobody
                 Addon.PartyKeys[nobody]["class"] = class
@@ -139,9 +157,11 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             buttons[ibutton] = CreateFrame("Button", nil, Debug, "UIPanelButtonTemplate")
             buttons[ibutton]:SetText("addFakeGuild")
             buttons[ibutton]:SetScript("OnClick", function(self, button)
-                local guild = GetGuildInfo("player") or "none"
+                local guild = GetGuildInfo("player")
+                if not guild then return end
                 local _, classFilename = C_PlayerInfo.GetClass(PlayerLocation:CreateFromUnit("player"))
                 local char = "toto"
+                LibMythicKeystoneDB['Guilds'][guild] = LibMythicKeystoneDB['Guilds'][guild] or {}
                 LibMythicKeystoneDB['Guilds'][guild][char] = {
                     ["class"] = classFilename,
                     ["name"] = char,
@@ -177,11 +197,9 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
                 Addon.trace(homePlayers)
                 if homePlayers then
                     for _, name in pairs(homePlayers) do
-                        -- local name, realm = strsplit("-", name)
-                        -- print(name)
                         Addon.trace(UnitName(name))
                         local _, class = UnitClass(name)
-                        Addon.trace(UnitName(class))
+                        Addon.trace(class)
                     end
                 end
             end)
@@ -198,7 +216,7 @@ LibMythicKeystoneDebug:SetScript("OnEvent", function(self, event, addOnName, ...
             local startxpos = 0
             local startypos = 0
             local i = 0
-            for key in pairs(buttons) do
+            for key in ipairs(buttons) do
                 if (key%2 ~= 0) then
                     startxpos = -10 - 40 * i
                     startypos = 0
