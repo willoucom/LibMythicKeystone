@@ -1,7 +1,7 @@
 # LibMythicKeystone
 
-LibMythicKeystone is a library that retrieves and synchronizes mythical dungeon keys. The library exposes account character keys for use in various addons.
+LibMythicKeystone is a library that retrieves and synchronizes Mythic+ keystones. The library exposes keystone data across your characters for use in various addons.
 
-This addon wont display anything and should only be installed as a dependancy.
+This addon won't display anything and should only be installed as a dependency.
 
-You can find the documentation for developers on [GitHub](https://github.com/willoucom/LibMythicKeystone/DEVELOPERS.md).
+You can find the documentation for developers on [GitHub](https://github.com/willoucom/LibMythicKeystone/blob/main/DEVELOPERS.md).
